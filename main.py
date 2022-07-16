@@ -1,7 +1,46 @@
 from tkinter import *
 from tkinter import filedialog
-import webbrowser
+import os
+#----------------------COMMANDS----------------------------
+filelist = []
+pathlist = []
 
+class AddFolder:
+    def addfolder(self):
+        self.folder = filedialog.askdirectory()
+        for x in os.listdir(self.folder):
+            filelist.append(x)
+        for x in filelist:
+            sourcelist.insert(END, x)
+
+        for i in filelist:
+            self.filepath = os.path.join(self.folder, i)
+            pathlist.append(self.filepath)
+
+
+class AddFiles:
+    def addfiles(self):
+        self.files = filedialog.askopenfilenames()
+        for x in (self.files):
+            pathlist.append(x)
+            filelist.append(os.path.basename(x))
+            sourcelist.insert(END, os.path.basename(x))
+
+class Clear:
+    def clear(self):
+        filelist.clear()
+        pathlist.clear()
+        sourcelist.delete(0, END)
+
+class Sort:
+    def sort(self):
+        filelist.sort()
+        pathlist.sort()
+        sourcelist.delete(0, END)
+        for x in filelist:
+            sourcelist.insert(END, x)
+
+#----------------------GUI---------------------------------
 window = Tk()
 window.geometry("800x600")
 window.config(bg="blue")
@@ -10,18 +49,18 @@ window.title("Renamer by Sree Teja Dusi")
 #----------------------FIRSTFRAME---------------------------
 firstframe = Frame(window, bg="blue", padx=10, pady=10)
 selection = Label(firstframe, text="Source Files", fg="white", bg="blue", font=("Arial", 12))
-addfolder = Button(firstframe, text="Add Folder", bg="white", fg="#00008b", padx=2, bd=2 ,width=10)
-addfiles = Button(firstframe, text="Add Files", bg="white", fg="#00008b", padx=2,  bd=2 ,width=10)
+addfolder = Button(firstframe, text="Add Folder", bg="white", fg="#00008b", padx=2, bd=2 ,width=10, command=AddFolder().addfolder)
+addfiles = Button(firstframe, text="Add Files", bg="white", fg="#00008b", padx=2,  bd=2 ,width=10, command=AddFiles().addfiles)
 removesel = Button(firstframe, text="Remove Selection", bg="white", fg="#00008b", padx=2,  bd=2 ,width=10)
-clear = Button(firstframe, text="Clear", bg="white", fg="#00008b", padx=2,  bd=2 ,width=10)
-sort = Button(firstframe, text="Sort", bg="white", fg="#00008b", padx=2,  bd=2 ,width=10)
+clear = Button(firstframe, text="Clear", bg="white", fg="#00008b", padx=2,  bd=2 ,width=10 ,command= Clear().clear)
+sort = Button(firstframe, text="Sort", bg="white", fg="#00008b", padx=2,  bd=2 ,width=10, command= Sort().sort)
 preview = Button(firstframe, text="Preview", bg="white", fg="#00008b", padx=2,  bd=2 ,width=10)
 rename = Button(firstframe, text="Rename", bg="yellow", fg="#00008b", padx=2,  bd=2 ,width=10)
 
 #----------------------SECONDFRAME--------------------------
 secondframe = Frame(window, bg="blue", padx=10, pady=10)
 scrollone = Scrollbar(secondframe)
-sourcelist = Listbox(secondframe, bg="#00008b",fg="white")
+sourcelist = Listbox(secondframe, bg="#00008b",fg="white", selectmode=MULTIPLE)
 sourcelist.config(yscrollcommand=scrollone.set, width=114)
 scrollone.config(command=sourcelist.yview)
 
@@ -62,8 +101,7 @@ rename.grid(row=1, column=13, padx=10)
 #SECONDFRAME
 sourcelist.pack(side=LEFT)
 scrollone.pack(side=RIGHT, fill=BOTH)
-for x in range(1,100):
-    sourcelist.insert(END,x)
+
 #THIRDFRAME
 modified.pack(side=LEFT)
 total.pack(side=LEFT, padx=10)
@@ -71,8 +109,6 @@ current.pack(side=RIGHT, padx=120)
 #FOURTHFRAME
 renamedlist.pack(side=LEFT)
 scrolltwo.pack(side=RIGHT, fill=BOTH)
-for x in range(1,100):
-    renamedlist.insert(END,x)
 
 
 window.mainloop()
