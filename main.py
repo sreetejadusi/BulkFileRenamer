@@ -1,23 +1,26 @@
 from tkinter import *
 from tkinter import filedialog
+from pathlib import Path
 import os
 
 # ----------------------COMMANDS----------------------------
-filelist = []
 pathlist = []
+filenames = []
+extensions = []
+renamelist = []
 
 
 class AddFolder:
     def addfolder(self):
         self.folder = filedialog.askdirectory()
         for x in os.listdir(self.folder):
-            filelist.append(x)
-        for x in filelist:
-            sourcelist.insert(END, x)
-
-        for i in filelist:
-            self.filepath = os.path.join(self.folder, i)
-            pathlist.append(self.filepath)
+            pathlist.append(os.path.join(self.folder, x))
+            filenames.append(Path(x).stem)
+            splitter = x.split(".")
+            extensions.append(splitter[-1])
+        for x in pathlist:
+            sourcelist.insert(END, os.path.basename(x))
+        renamedlist.delete(0, END)
 
 
 class AddFiles:
@@ -25,24 +28,221 @@ class AddFiles:
         self.files = filedialog.askopenfilenames()
         for x in self.files:
             pathlist.append(x)
-            filelist.append(os.path.basename(x))
+            filenames.append(Path(x).stem)
+            extensions.append(Path(x).name.split(".")[-1])
             sourcelist.insert(END, os.path.basename(x))
+        renamedlist.delete(0, END)
 
 
 class Clear:
     def clear(self):
-        filelist.clear()
         pathlist.clear()
+        filenames.clear()
+        extensions.clear()
         sourcelist.delete(0, END)
 
 
 class Sort:
     def sort(self):
-        filelist.sort()
         pathlist.sort()
+        filenames.sort()
+        extensions.sort()
         sourcelist.delete(0, END)
-        for x in filelist:
-            sourcelist.insert(END, x)
+        for x in pathlist:
+            sourcelist.insert(END, os.path.basename(x))
+
+class Rename:
+    def rename(self):
+        renamedlist.delete(0, END)
+        def replace():
+            if checkboxvar.get() == 1:
+                replaced = []
+                renamedfiles = []
+                for x in list(filenames):
+                    if entryreplace.get() in x:
+                        replaced.append(x.replace(entryreplace.get(), entryreplacewith.get()))
+                    else:
+                        replaced.append(x)
+
+                zipper = dict(zip(replaced, extensions))
+                for x, y in zipper.items():
+                    renamedfiles.append(x + '.' + y)
+                zipper2 = dict(zip(pathlist, renamedfiles))
+                for x, y in zipper2.items():
+                    renamelist.append(os.path.join(os.path.dirname(x), y))
+                tempdict = dict(zip(pathlist, renamelist))
+                for key, value in tempdict.items():
+                    os.rename(key, value)
+                pathlist.clear()
+                filenames.clear()
+                renamelist.clear()
+                extensions.clear()
+                for x in list(renamelist):
+                    renamedlist.insert(END, os.path.basename(X))
+                sourcelist.delete(0, END)
+
+        def remove():
+            if checkboxvar.get() == 3 and lrddchoice.get() == "left":
+                removed = []
+                removedpath = []
+                for x in list(filenames):
+                    removed.append(x[int(entryremove.get()):len(x)])
+                dict1 = dict(zip(removed, extensions))
+                for x, y in dict1.items():
+                    removedpath.append(x + '.' + y)
+                dict2 = dict(zip(pathlist, removedpath))
+                for x, y in dict2.items():
+                    renamelist.append(os.path.join(os.path.dirname(x), y))
+                finaldict = dict(zip(pathlist, renamelist))
+                for x, y in finaldict.items():
+                    os.rename(x, y)
+                pathlist.clear()
+                filenames.clear()
+                extensions.clear()
+                sourcelist.delete(0, END)
+                for x in list(renamelist):
+                    renamedlist.insert(END, os.path.basename(X))
+                renamelist.clear()
+
+            if checkboxvar.get() == 3 and lrddchoice.get() == "right":
+                removedright = []
+                removedrightpath = []
+                for x in list(filenames):
+                    start = 0 - int(entryremove.get())
+                    print(start)
+                    y = x[start:0:-1]
+                    removedright.append(y[::-1])
+                dict1right = dict(zip(removedright, extensions))
+                for x, y in dict1right.items():
+                    removedrightpath.append(x + '.' + y)
+                dict2right = dict(zip(pathlist, removedrightpath))
+                for x, y in dict2right.items():
+                    renamelist.append(os.path.join(os.path.dirname(x), y))
+                finaldictright = dict(zip(pathlist, renamelist))
+                for x, y in finaldictright.items():
+                    os.rename(x, y)
+                pathlist.clear()
+                filenames.clear()
+                extensions.clear()
+                sourcelist.delete(0, END)
+                for x in list(renamelist):
+                    renamedlist.insert(END, os.path.basename(X))
+                renamelist.clear()
+
+        def case():
+            if checkboxvar.get() == 5:
+                cased = []
+                casedfiles = []
+                if casechoice.get() == "First Letter Upper":
+                    for x in list(filenames):
+                        cased.append(x.capitalize())
+                    dict1 = dict(zip(cased, extensions))
+                    for x, y in dict1.items():
+                        casedfiles.append(x + '.' + y)
+                    dict2 = dict(zip(pathlist, casedfiles))
+                    for x, y in dict2.items():
+                        renamelist.append(os.path.join(os.path.dirname(x), y))
+                    finaldict = dict(zip(pathlist, renamelist))
+                    for x, y in finaldict.items():
+                        os.rename(x, y)
+                    pathlist.clear()
+                    filenames.clear()
+                    extensions.clear()
+                    for x in list(renamelist):
+                        renamedlist.insert(END, os.path.basename(X))
+                    sourcelist.delete(0, END)
+                    renamelist.clear()
+
+                if casechoice.get() == "lower":
+                    for x in list(filenames):
+                        cased.append(x.lower())
+                    dict1 = dict(zip(cased, extensions))
+                    for x, y in dict1.items():
+                        casedfiles.append(x + '.' + y)
+                    dict2 = dict(zip(pathlist, casedfiles))
+                    for x, y in dict2.items():
+                        renamelist.append(os.path.join(os.path.dirname(x), y))
+                    finaldict = dict(zip(pathlist, renamelist))
+                    for x, y in finaldict.items():
+                        os.rename(x, y)
+                    pathlist.clear()
+                    filenames.clear()
+                    extensions.clear()
+                    for x in list(renamelist):
+                        renamedlist.insert(END, os.path.basename(X))
+                    sourcelist.delete(0, END)
+                    renamelist.clear()
+
+                if casechoice.get() == "UPPER":
+                    for x in list(filenames):
+                        cased.append(x.upper())
+                    dict1 = dict(zip(cased, extensions))
+                    for x, y in dict1.items():
+                        casedfiles.append(x + '.' + y)
+                    dict2 = dict(zip(pathlist, casedfiles))
+                    for x, y in dict2.items():
+                        renamelist.append(os.path.join(os.path.dirname(x), y))
+                    finaldict = dict(zip(pathlist, renamelist))
+                    for x, y in finaldict.items():
+                        os.rename(x, y)
+                    pathlist.clear()
+                    filenames.clear()
+                    extensions.clear()
+                    for x in list(renamelist):
+                        renamedlist.insert(END, os.path.basename(X))
+                    sourcelist.delete(0, END)
+                    renamelist.clear()
+
+        def pos():
+            if poschoice.get() == 7 and entrytext.get() == "start":
+                added = []
+                addedfiles = []
+                for x in list(filenames):
+                    added.append(str(entrytext.get())+str(x))
+                dict1 = dict(zip(added, extensions))
+                for x,y in dict1.items():
+                    addedfiles.append(x+'.'+y)
+                dict2 = dict(zip(pathlist, addedfiles))
+                for x,y in dict2.items():
+                    renamelist.append(os.path.join(os.path.dirname(x), y))
+                finaldict = dict(zip(pathlist, renamelist))
+                for x,y in finaldict.items():
+                    os.rename(x,y)
+                pathlist.clear()
+                filenames.clear()
+                extensions.clear()
+                sourcelist.delete(0, END)
+                for x in list(renamelist):
+                    renamedlist.insert(END, os.path.basename(X))
+                renamelist.clear()
+
+            if poschoice.get() == 7 and entrytext.get() == "end":
+                added = []
+                addedfiles = []
+                for x in list(filenames):
+                    added.append(str(x) + str(entrytext.get()))
+                dict1 = dict(zip(added, extensions))
+                for x,y in dict1.items():
+                    addedfiles.append(x+'.'+y)
+                dict2 = dict(zip(pathlist, addedfiles))
+                for x,y in dict2.items():
+                    renamelist.append(os.path.join(os.path.dirname(x), y))
+                finaldict = dict(zip(pathlist, renamelist))
+                for x,y in finaldict.items():
+                    os.rename(x,y)
+                pathlist.clear()
+                filenames.clear()
+                extensions.clear()
+                sourcelist.delete(0, END)
+                for x in list(renamelist):
+                    renamedlist.insert(END, os.path.basename(X))
+                renamelist.clear()
+
+
+
+        replace()
+        remove()
+        case()
 
 
 # ----------------------GUI---------------------------------
@@ -61,8 +261,7 @@ addfiles = Button(firstframe, text="Add Files", bg="white", fg="#00008b", padx=2
 removesel = Button(firstframe, text="Remove Selection", bg="white", fg="#00008b", padx=2, bd=2, width=10)
 clear = Button(firstframe, text="Clear", bg="white", fg="#00008b", padx=2, bd=2, width=10, command=Clear().clear)
 sort = Button(firstframe, text="Sort", bg="white", fg="#00008b", padx=2, bd=2, width=10, command=Sort().sort)
-preview = Button(firstframe, text="Preview", bg="white", fg="#00008b", padx=2, bd=2, width=10)
-rename = Button(firstframe, text="Rename", bg="yellow", fg="#00008b", padx=2, bd=2, width=10)
+rename = Button(firstframe, text="Rename", bg="yellow", fg="#00008b", padx=2, bd=2, width=10, command=Rename().rename)
 
 # ----------------------SECONDFRAME--------------------------
 secondframe = Frame(window, bg="blue", padx=10, pady=10)
@@ -74,8 +273,6 @@ scrollone.config(command=sourcelist.yview)
 # ----------------------THIRDFRAME---------------------------
 thirdframe = Frame(window, bg="blue", padx=10, pady=10)
 modified = Label(thirdframe, text="Renamed Files", fg="white", bg="blue", font=("Arial", 12))
-total = Label(thirdframe, text="Total Files To Be Renamed: ", bg="blue", fg="white", font=("Arial", 12))
-current = Label(thirdframe, text="Current Operation: ", bg="blue", fg="white", font=("Arial", 12))
 
 # ----------------------FOURTHFRAME-------------------------
 
@@ -86,20 +283,16 @@ renamedlist.config(yscrollcommand=scrolltwo.set, width=114)
 scrolltwo.config(command=renamedlist.yview)
 
 # -----------------------FIFTHFRAME-------------------------
-dropdown = ['Including Extension', 'Excluding Extension']
-extchoice = StringVar()
-extchoice.set('Excluding Extension')
 fifthframe = Frame(window, bg="blue", padx=10, pady=10)
-
 # FIFTHSUBONE
 
 fifthsubone = Frame(fifthframe, bg="blue", padx=10, pady=10)
-checkboxreplacevar = IntVar()
+checkboxvar = IntVar()
 checkboxreplace = Checkbutton(fifthsubone,
                               text="Replace",
-                              variable=checkboxreplacevar,
+                              variable=checkboxvar,
                               onvalue=1,
-                              offvalue=0,
+                              offvalue=2,
                               bg="blue",
                               fg="black",
                               activeforeground="black",
@@ -107,32 +300,19 @@ checkboxreplace = Checkbutton(fifthsubone,
                               font=("Arial", 12)
                               )
 entryreplace = Entry(fifthsubone, bg="white", fg="black", font=("Arial", 12), width=16)
-casecheckreplacevar = IntVar()
-casecheckreplace = Checkbutton(fifthsubone,
-                               text="(case-sensitive) with,",
-                               variable=casecheckreplacevar,
-                               onvalue=1,
-                               offvalue=0,
-                               bg="blue",
-                               fg="black",
-                               activeforeground="black",
-                               activebackground="blue",
-                               font=("Arial", 12)
-                               )
+labelwith = Label(fifthsubone, bg="blue", fg="white", font=("Arial", 12), text="with")
 entryreplacewith = Entry(fifthsubone, bg="white", fg="black", font=("Arial", 12), width=16)
-isextreplace = OptionMenu(fifthsubone, extchoice, *dropdown)
 
 # FIFTHSUBTWO
-checkboxremovevar = IntVar()
 leftorrightdd = ['left', 'right']
 lrddchoice = StringVar()
 lrddchoice.set("left")
 fifthsubtwo = Frame(fifthframe, bg="blue", padx=10, pady=10)
 checkboxremove = Checkbutton(fifthsubtwo,
                              text="Remove",
-                             onvalue=1,
-                             offvalue=0,
-                             variable=checkboxremovevar,
+                             onvalue=3,
+                             offvalue=4,
+                             variable=checkboxvar,
                              bg="blue",
                              fg="black",
                              activeforeground="black",
@@ -140,23 +320,20 @@ checkboxremove = Checkbutton(fifthsubtwo,
                              font=("Arial", 12)
                              )
 entryremove = Entry(fifthsubtwo, bg="white", fg="black", font=("Arial", 12), width=7)
-labelstarting = Label(fifthsubtwo, bg="blue", fg="white", font=("Arial", 12), text="characters, starting(including)")
-entryremoveincl = Entry(fifthsubtwo, bg="white", fg="black", font=("Arial", 12), width=7)
+labelstarting = Label(fifthsubtwo, bg="blue", fg="white", font=("Arial", 12), text="characters")
 labelfromthe = Label(fifthsubtwo, bg="blue", fg="white", font=("Arial", 12), text="from the")
 leftorright = OptionMenu(fifthsubtwo, lrddchoice, *leftorrightdd)
-isextremove = OptionMenu(fifthsubtwo, extchoice, *dropdown)
 
 # FIFTHSUBTHREE
 caselist = ['First Letter Upper', 'UPPER', 'lower']
 casechoice = StringVar()
 casechoice.set('First Letter Upper')
 fifthsubthree = Frame(fifthframe, bg="blue", padx=10, pady=10)
-checkboxcasevar = IntVar()
 checkboxcase = Checkbutton(fifthsubthree,
                            text="Change case to",
-                           onvalue=1,
-                           offvalue=0,
-                           variable=checkboxcasevar,
+                           onvalue=5,
+                           offvalue=6,
+                           variable=checkboxvar,
                            bg="blue",
                            fg="black",
                            activeforeground="black",
@@ -164,19 +341,17 @@ checkboxcase = Checkbutton(fifthsubthree,
                            font=("Arial", 12)
                            )
 case = OptionMenu(fifthsubthree, casechoice, *caselist)
-isextcase = OptionMenu(fifthsubthree, extchoice, *dropdown)
 
 # FIFTHSUBFOUR
 poslist = ['start', 'end']
 poschoice = StringVar()
 poschoice.set('start')
 fifthsubfour = Frame(fifthframe, bg="blue", padx=10, pady=10)
-checkboxaddvar = IntVar()
 checkboxadd = Checkbutton(fifthsubfour,
                           text="Add text,",
-                          variable=checkboxaddvar,
-                          onvalue=1,
-                          offvalue=0,
+                          variable=checkboxvar,
+                          onvalue=7,
+                          offvalue=8,
                           bg="blue",
                           fg="black",
                           activeforeground="black",
@@ -187,7 +362,8 @@ entrytext = Entry(fifthsubfour, bg="white", fg="black", font=("Arial", 12), widt
 labeltext = Label(fifthsubfour, bg="blue", fg="white", font=("Arial", 12), text="to the")
 position = OptionMenu(fifthsubfour, poschoice, *poslist)
 labeltexttwo = Label(fifthsubfour, bg="blue", fg="white", font=("Arial", 12), text="end of each filename")
-isextcase = OptionMenu(fifthsubthree, extchoice, *dropdown)
+####################END###################################
+Label(window, text="Sree Teja Dusi", font=("Comic Sans", 13), fg="white", bg="blue").pack(side=BOTTOM)
 
 # FRAMES
 firstframe.pack()
@@ -208,7 +384,6 @@ addfolder.grid(row=1, column=3, padx=10)
 addfiles.grid(row=1, column=5, padx=10)
 clear.grid(row=1, column=7, padx=10)
 sort.grid(row=1, column=9, padx=10)
-preview.grid(row=1, column=11, padx=10)
 rename.grid(row=1, column=13, padx=10)
 # SECONDFRAME
 sourcelist.pack(side=LEFT)
@@ -216,8 +391,6 @@ scrollone.pack(side=RIGHT, fill=BOTH)
 
 # THIRDFRAME
 modified.pack(side=LEFT)
-total.pack(side=LEFT, padx=10)
-current.pack(side=RIGHT, padx=120)
 
 # FOURTHFRAME
 renamedlist.pack(side=LEFT)
@@ -226,23 +399,19 @@ scrolltwo.pack(side=RIGHT, fill=BOTH)
 # FIFTHFRAME
 # FIFTHSUBONE
 checkboxreplace.pack(side=LEFT)
-entryreplace.pack(side=LEFT)
-casecheckreplace.pack(side=LEFT)
-entryreplacewith.pack(side=LEFT)
-isextreplace.pack(side=RIGHT, padx=5)
+entryreplace.pack(side=LEFT, padx=10)
+labelwith.pack(side=LEFT)
+entryreplacewith.pack(side=LEFT, padx=10)
 
 # FIFTHSUBTWO
 checkboxremove.pack(side=LEFT)
 entryremove.pack(side=LEFT)
 labelstarting.pack(side=LEFT)
-entryremoveincl.pack(side=LEFT)
 labelfromthe.pack(side=LEFT)
 leftorright.pack(side=LEFT, padx=5)
-isextremove.pack(side=RIGHT)
 # FIFTHSUBTHREE
 checkboxcase.pack(side=LEFT)
 case.pack(side=LEFT)
-isextcase.pack(side=RIGHT, padx=5)
 
 # FIFTHSUBFOUR
 checkboxadd.pack(side=LEFT)
@@ -250,6 +419,5 @@ entrytext.pack(side=LEFT)
 labeltext.pack(side=LEFT)
 position.pack(side=LEFT, padx=5)
 labeltexttwo.pack(side=LEFT)
-isextcase.pack(side=LEFT)
 
 window.mainloop()
